@@ -3,5 +3,5 @@
 </script>
 
 <template>
-  <router-view />
+Home
 </template>
