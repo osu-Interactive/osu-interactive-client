@@ -31,3 +31,27 @@ export async function loginWithOsuApiCode(
         throw err
     }
 }
+
+interface SaveSkillsRequest {
+    skills: number[]
+}
+
+interface SaveSkillsResponse {
+    status: string
+}
+
+export async function saveUserSkills(
+    skills: number[],
+): Promise<SaveSkillsResponse> {
+    try {
+        const res = await axios.post<SaveSkillsResponse>(
+            `${config.server_url}/survey/save`,
+            { skills } as SaveSkillsRequest,
+        )
+
+        return res.data
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+}
