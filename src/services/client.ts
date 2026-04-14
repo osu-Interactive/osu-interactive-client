@@ -1,6 +1,7 @@
 import config from '../config.ts'
 import axios from 'axios'
 
+
 export async function fetchOsuApiAuthLink(): Promise<string> {
     try {
         const res = await axios.get(`${config.server_url}/auth/osuApiAuthLink`)
@@ -40,6 +41,13 @@ interface SaveSkillsResponse {
     status: string
 }
 
+interface SaveModsRequest {
+    mods: number[]
+}
+
+interface SaveModsResponse {
+    status: string
+}
 export async function saveUserSkills(
     skills: number[],
 ): Promise<SaveSkillsResponse> {
@@ -47,6 +55,22 @@ export async function saveUserSkills(
         const res = await axios.post<SaveSkillsResponse>(
             `${config.server_url}/survey/save`,
             { skills } as SaveSkillsRequest,
+        )
+
+        return res.data
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+}
+
+export async function saveUserMods(
+    mods: number[],
+): Promise<SaveModsResponse> {
+    try {
+        const res = await axios.post<SaveSkillsResponse>(
+            `${config.server_url}/survey/save`,
+            { mods } as SaveModsRequest,
         )
 
         return res.data
