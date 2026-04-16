@@ -3,7 +3,10 @@ import axios from 'axios'
 
 export async function fetchOsuApiAuthLink(): Promise<string> {
     try {
-        const res = await axios.get(`${config.server_url}/auth/osuApiAuthLink`)
+        const res = await axios.get(
+            `${config.server_url}/auth/osuApiAuthLink`,
+            { withCredentials: true },
+        )
         return res.data.authLink
     } catch (err) {
         console.error(err)
@@ -18,11 +21,13 @@ interface LoginResponse {
 
 export async function loginWithOsuApiCode(
     osuApiCode: string,
+    osuApiState: string,
 ): Promise<LoginResponse> {
     try {
         const res = await axios.post<LoginResponse>(
             `${config.server_url}/auth/login`,
-            { osuApiCode },
+            { osuApiCode, osuApiState },
+            { withCredentials: true },
         )
 
         return res.data
