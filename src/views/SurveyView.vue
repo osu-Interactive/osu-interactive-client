@@ -1,7 +1,8 @@
 <template>
-    <div class="survey">
+    <div v-if="!surveyStore.isCompleted" class="survey">
         <h2>{{ questions[currentStep].title }}</h2>
-        <p>Крок {{ currentStep + 1 }} / {{ questions.length }}</p>
+        <p>Step {{ currentStep + 1 }} / {{ questions.length }}</p>
+
         <div class="grid">
             <div
                 v-for="skill in questions[currentStep].skills"
@@ -12,6 +13,7 @@
             >
                 {{ skill.name }}
             </div>
+
             <div
                 v-for="mod in questions[currentStep].mods"
                 :key="mod.id"
@@ -22,6 +24,7 @@
                 {{ mod.name }}
             </div>
         </div>
+
         <div class="navigation">
             <button @click="prevStep" :disabled="currentStep === 0">
                 ⬅️ Previous
@@ -35,24 +38,30 @@
                 Next ➡️
             </button>
 
-            <button v-else @click="confirmFinish">Завершити ✅</button>
+            <button v-else @click="confirmFinish">That's all ✅</button>
         </div>
+
         <div v-if="showModal" class="modal-overlay" @click="handleCancel">
             <div class="modal" @click.stop>
                 <h3>Are you sure?</h3>
-                <p>Ти завершиш опитування</p>
+                <p>You will finish the survey</p>
 
                 <div class="modal-actions">
-                    <button class="cancel" @click="handleCancel">
-                        Скасувати
-                    </button>
+                    <button class="cancel" @click="handleCancel">Cancel</button>
 
                     <button class="confirm" @click="handleConfirm">
-                        Так, завершити
+                        Yep, finish it
                     </button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div v-else class="completed">
+        <h2>You have already finished the survey</h2>
+        <p>You probably know it tho</p>
+
+        <button @click="restartSurvey">Changed your mind?</button>
     </div>
 </template>
 
@@ -60,7 +69,10 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSurveyResult, saveSurveyResult } from '@/services/client'
+import { useSurveyStore } from '@/stores/survey'
+
 const router = useRouter()
+const surveyStore = useSurveyStore()
 
 interface Skill {
     id: number
@@ -159,10 +171,20 @@ const finishSurvey = async () => {
             mods: selectedMods.value,
         })
 
+        surveyStore.setSurvey(selectedSkills.value, selectedMods.value)
+
         router.push({ name: 'home' })
     } catch (err) {
         console.error('Помилка збереження', err)
     }
+}
+
+const restartSurvey = () => {
+    surveyStore.resetSurvey()
+
+    selectedSkills.value = []
+    selectedMods.value = []
+    currentStep.value = 0
 }
 
 const toggleSkill = (id: number) => {
@@ -187,10 +209,20 @@ const toggleMod = (id: number) => {
 
 onMounted(async () => {
     try {
+        if (surveyStore.isCompleted) {
+            selectedSkills.value = surveyStore.skillsets
+            selectedMods.value = surveyStore.mods
+            return
+        }
+
         const data = await getSurveyResult()
 
         selectedSkills.value = data.skillsets || []
         selectedMods.value = data.mods || []
+
+        if (data.skillsets?.length || data.mods?.length) {
+            surveyStore.setSurvey(data.skillsets || [], data.mods || [])
+        }
     } catch (err) {
         console.error('Не вдалося завантажити survey', err)
     }
