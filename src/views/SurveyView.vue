@@ -1,55 +1,99 @@
 <template>
-    <div v-if="!surveyStore.isCompleted" class="survey">
-        <h2>{{ questions[currentStep].title }}</h2>
-        <p>Step {{ currentStep + 1 }} / {{ questions.length }}</p>
+    <div
+        v-if="!surveyStore.isCompleted"
+        class="min-h-screen bg-gray-100 flex items-center justify-center px-4"
+    >
+        <div class="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8">
+            <h2 class="text-3xl font-bold text-center mb-2">
+                {{ questions[currentStep].title }}
+            </h2>
 
-        <div class="grid">
-            <div
-                v-for="skill in questions[currentStep].skills"
-                :key="skill.id"
-                class="card"
-                :class="{ active: selectedSkills.includes(skill.id) }"
-                @click="toggleSkill(skill.id)"
-            >
-                {{ skill.name }}
+            <p class="text-center text-gray-500 mb-6">
+                Step {{ currentStep + 1 }} / {{ questions.length }}
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div
+                    v-for="skill in questions[currentStep].skills"
+                    :key="skill.id"
+                    @click="toggleSkill(skill.id)"
+                    class="p-6 border-2 rounded-xl cursor-pointer transition text-center font-medium"
+                    :class="
+                        selectedSkills.includes(skill.id)
+                            ? 'border-green-500 bg-green-100'
+                            : 'border-gray-300 hover:border-gray-400'
+                    "
+                >
+                    {{ skill.name }}
+                </div>
+
+                <div
+                    v-for="mod in questions[currentStep].mods"
+                    :key="mod.id"
+                    @click="toggleMod(mod.id)"
+                    class="p-6 border-2 rounded-xl cursor-pointer transition text-center font-medium"
+                    :class="
+                        selectedMods.includes(mod.id)
+                            ? 'border-blue-500 bg-blue-100'
+                            : 'border-gray-300 hover:border-gray-400'
+                    "
+                >
+                    {{ mod.name }}
+                </div>
             </div>
 
-            <div
-                v-for="mod in questions[currentStep].mods"
-                :key="mod.id"
-                class="card"
-                :class="{ active: selectedMods.includes(mod.id) }"
-                @click="toggleMod(mod.id)"
-            >
-                {{ mod.name }}
+            <div class="flex justify-between">
+                <button
+                    @click="prevStep"
+                    :disabled="currentStep === 0"
+                    class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                >
+                    ⬅️ Previous
+                </button>
+
+                <button
+                    v-if="currentStep < questions.length - 1"
+                    @click="nextStep"
+                    :disabled="!isStepValid()"
+                    class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
+                >
+                    Next ➡️
+                </button>
+
+                <button
+                    v-else
+                    @click="confirmFinish"
+                    class="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
+                >
+                    Finish ✅
+                </button>
             </div>
         </div>
 
-        <div class="navigation">
-            <button @click="prevStep" :disabled="currentStep === 0">
-                ⬅️ Previous
-            </button>
-
-            <button
-                v-if="currentStep < questions.length - 1"
-                @click="nextStep"
-                :disabled="!isStepValid()"
+        <div
+            v-if="showModal"
+            class="fixed inset-0 bg-black/50 flex items-center justify-center"
+            @click="handleCancel"
+        >
+            <div
+                class="bg-white p-6 rounded-2xl shadow-lg w-80 text-center"
+                @click.stop
             >
-                Next ➡️
-            </button>
+                <h3 class="text-xl font-semibold mb-2">Are you sure?</h3>
+                <p class="text-gray-500 mb-4">You will finish the survey</p>
 
-            <button v-else @click="confirmFinish">That's all ✅</button>
-        </div>
+                <div class="flex justify-between">
+                    <button
+                        @click="handleCancel"
+                        class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                    >
+                        Cancel
+                    </button>
 
-        <div v-if="showModal" class="modal-overlay" @click="handleCancel">
-            <div class="modal" @click.stop>
-                <h3>Are you sure?</h3>
-                <p>You will finish the survey</p>
-
-                <div class="modal-actions">
-                    <button class="cancel" @click="handleCancel">Cancel</button>
-
-                    <button class="confirm" @click="handleConfirm">
+                    <button
+                        @click="handleConfirm"
+                        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                    >
                         Yep, finish it
                     </button>
                 </div>
@@ -57,11 +101,26 @@
         </div>
     </div>
 
-    <div v-else class="completed">
-        <h2>You have already finished the survey</h2>
-        <p>You probably know it tho</p>
+    <div
+        v-else
+        class="min-h-screen flex items-center justify-center bg-gray-100 px-4"
+    >
+        <div
+            class="bg-white p-6 rounded-2xl shadow-md text-center max-w-xl w-full"
+        >
+            <h2 class="text-2xl font-bold mb-2">
+                You have already finished the survey
+            </h2>
 
-        <button @click="restartSurvey">Changed your mind?</button>
+            <p class="text-gray-500 mb-4">You probably know it tho</p>
+
+            <button
+                @click="restartSurvey"
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+                Changed your mind?
+            </button>
+        </div>
     </div>
 </template>
 
@@ -229,84 +288,4 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-.card {
-    padding: 20px;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.card:hover {
-    border-color: #888;
-}
-
-.card.active {
-    border-color: #42b883;
-    background: #e6f7f1;
-}
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    z-index: 1000;
-}
-
-.modal {
-    background: white;
-    padding: 24px;
-    border-radius: 16px;
-    width: 300px;
-    text-align: center;
-
-    animation: fadeIn 0.2s ease;
-}
-
-.modal-actions {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-}
-
-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.cancel {
-    background: #ccc;
-}
-
-.confirm {
-    background: #42b883;
-    color: white;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-</style>
+<style scoped></style>
