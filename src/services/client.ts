@@ -36,3 +36,31 @@ export async function loginWithOsuApiCode(
         throw err
     }
 }
+
+export async function sendLogoutRequest() {
+    try {
+        const res = await axios.post(
+            `${config.server_url}/auth/logout`,
+            {},
+            { withCredentials: true },
+        )
+
+        return res.data
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+}
+
+export async function getMe() {
+    try {
+        const res = await axios.get(`${config.server_url}/auth/me`, {
+            withCredentials: true,
+        })
+
+        return res.data
+    } catch (err) {
+        console.error(err)
+        throw err
+    }
+}

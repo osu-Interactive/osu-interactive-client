@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { fetchOsuApiAuthLink, loginWithOsuApiCode } from '../services/client.ts'
+import { fetchOsuApiAuthLink, loginWithOsuApiCode, sendLogoutRequest, getMe as fetchMe } from '../services/client.ts'
+
 import { ref, onMounted } from 'vue'
 
 const code = ref<string | null>(null)
@@ -25,12 +26,22 @@ onMounted(async () => {
         console.log(loginData)
     }
 })
+async function logout() {
+    console.log(await sendLogoutRequest())
+}
 
 async function redirectToOsuApiLogin(): Promise<void> {
     window.location.href = await fetchOsuApiAuthLink()
+}
+
+async function getMe(): Promise<void> {
+    const loginData = await fetchMe();
+    console.log(loginData)
 }
 </script>
 
 <template>
     <button @click="redirectToOsuApiLogin">Login</button>
+    <button @click="logout">Logout</button>
+    <button @click="getMe">Get Info About me</button>
 </template>
