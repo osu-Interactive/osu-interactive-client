@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 
 import HomeView from '@/views/HomeView.vue'
 import Login from '@/views/LoginView.vue'
+import SurveyView from '@/views/SurveyView.vue'
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -14,6 +15,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/login',
         name: 'login',
         component: Login,
+    },
+    {
+        path: '/survey',
+        name: 'survey',
+        component: SurveyView,
     },
 ]
 
