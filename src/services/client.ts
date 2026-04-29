@@ -15,8 +15,9 @@ export async function saveSurveyResult(
 ): Promise<SurveyResultResponse> {
     try {
         const res = await axios.post<SurveyResultResponse>(
-            `${config.server_url}/survey/save`,
+            `${config.server_url}/user/survey/save`,
             data,
+            { withCredentials: true },
         )
 
         return res.data
@@ -34,7 +35,8 @@ interface SurveyResultResponse {
 export async function getSurveyResult(): Promise<SurveyResultResponse> {
     try {
         const res = await axios.get<SurveyResultResponse>(
-            `${config.server_url}/survey`,
+            `${config.server_url}/user/survey`,
+            { withCredentials: true  },
         )
 
         return res.data
