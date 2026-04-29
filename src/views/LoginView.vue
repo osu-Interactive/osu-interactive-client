@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fetchOsuApiAuthLink, loginWithOsuApiCode, sendLogoutRequest, getMe as fetchMe } from '../services/client.ts'
+import { fetchOsuApiAuthLink, login, sendLogoutRequest, refreshAuth, getMe as fetchMe } from '../services/client-auth.ts'
 
 import { ref, onMounted } from 'vue'
 
@@ -22,7 +22,7 @@ onMounted(async () => {
         const newUrl = url.pathname + (params.toString() ? `?${params}` : '')
         window.history.replaceState({}, '', newUrl)
 
-        const loginData = await loginWithOsuApiCode(code.value!, state.value!)
+        const loginData = await login(code.value!, state.value!)
         console.log(loginData)
     }
 })
@@ -38,10 +38,25 @@ async function getMe(): Promise<void> {
     const loginData = await fetchMe();
     console.log(loginData)
 }
+
+async function refresh() {
+  const refreshResult = await refreshAuth()
+  console.log(refreshResult)
+}
 </script>
 
 <template>
     <button @click="redirectToOsuApiLogin">Login</button>
     <button @click="logout">Logout</button>
     <button @click="getMe">Get Info About me</button>
+    <button @click="refresh">Refresh Auth</button>
 </template>
+
+<style scoped>
+  button {
+    border: 1px solid black;
+    margin-left: 6px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+</style>
