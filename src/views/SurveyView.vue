@@ -127,62 +127,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getSurveyResult, saveSurveyResult } from '@/services/client'
 import { useSurveyStore } from '@/stores/survey'
+import { surveyQuestions } from '@/constants/survey-questions'
+import { getSurveyResult, saveSurveyResult } from '@/services/survey-client'
 
 const router = useRouter()
 const surveyStore = useSurveyStore()
 
-interface Skill {
-    id: number
-    name: string
-}
-interface Mod {
-    id: number
-    name: string
-}
-
 const selectedSkills = ref<number[]>([])
 const selectedMods = ref<number[]>([])
-
-interface Question {
-    id: number
-    title: string
-    skills: Skill[]
-    mods: Mod[]
-}
-
-const questions = ref<Question[]>([
-    {
-        id: 1,
-        title: 'Choose skill sets',
-        skills: [
-            { id: 1, name: 'Aim' },
-            { id: 2, name: 'Speed' },
-            { id: 3, name: 'Stamina' },
-            { id: 4, name: 'Accuracy' },
-            { id: 5, name: 'Reading' },
-            { id: 6, name: 'Alternate' },
-        ],
-        mods: [],
-    },
-    {
-        id: 2,
-        title: 'Choose mods',
-        skills: [],
-        mods: [
-            { id: 1, name: 'HD' },
-            { id: 2, name: 'DT' },
-            { id: 3, name: 'HR' },
-            { id: 4, name: 'EZ' },
-        ],
-    },
-])
+const questions = surveyQuestions
 
 const currentStep = ref(0)
 
 const nextStep = () => {
-    if (currentStep.value < questions.value.length - 1) {
+    if (currentStep.value < questions.length - 1) {
         currentStep.value++
     }
 }
@@ -194,7 +153,7 @@ const prevStep = () => {
 }
 
 const isStepValid = () => {
-    const q = questions.value[currentStep.value]
+    const q = questions[currentStep.value]
 
     if (q.skills.length > 0) {
         return selectedSkills.value.length > 0
