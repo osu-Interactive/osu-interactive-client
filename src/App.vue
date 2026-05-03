@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { initAuth } from './services/client-auth'
+import authService from '@/services/auth.service.ts'
 
-onMounted(() => {
-    initAuth()
+onMounted(async () => {
+    await authService.initAuth()
 })
 </script>
 

@@ -129,7 +129,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from '@/stores/survey'
 import { surveyQuestions } from '@/constants/survey-questions'
-import { getSurveyResult, saveSurveyResult } from '@/services/survey-client'
+import { getSurveyResult, saveSurveyResult } from '@/services/clients/survey.client.ts'
 
 const router = useRouter()
 const surveyStore = useSurveyStore()
