@@ -11,7 +11,6 @@ export default {
             )
             return res.data.authLink
         } catch (err) {
-            console.error(err)
             throw err
         }
     },
@@ -58,7 +57,6 @@ export default {
 
             return res.data
         } catch (err) {
-            console.error(err)
             throw err
         }
     }

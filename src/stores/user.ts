@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import type { RefreshTokenResponse } from '../types/osu.ts'
 
+const tokenRefreshBufferSeconds = 5
+
 export const useUserStore = defineStore('user', {
     state: () => ({
         user: null as null | any,
@@ -10,20 +12,28 @@ export const useUserStore = defineStore('user', {
     }),
 
     actions: {
-        setUserData(payload: any) {
+        setTokenExpiry(type: 'auth' | 'refresh', expiresInSeconds: number) {
+            //console.log(`${ type } token saved. Will expire in ${expiresInSeconds} seconds`)
             const now = Date.now()
+            const expiresAt = now + (expiresInSeconds - tokenRefreshBufferSeconds) * 1000
 
+            if (type === 'auth') {
+                this.authExpiresAt = expiresAt
+            } else {
+                this.refreshExpiresAt = expiresAt
+            }
+        },
+
+        setUserData(payload: any) {
             this.user = payload.user
 
-            this.authExpiresAt = now + (payload.authTokenExpiresIn - 2) * 1000
-            this.refreshExpiresAt = now + (payload.refreshTokenExpiresIn - 2) * 1000
+            this.setTokenExpiry('auth', payload.authTokenExpiresIn)
+            this.setTokenExpiry('refresh', payload.refreshTokenExpiresIn)
         },
 
         refreshAuthTokens(tokens: RefreshTokenResponse) {
-            console.log(tokens.authTokenExpiresIn, tokens.refreshTokenExpiresIn)
-            const now = Date.now()
-            this.authExpiresAt = now + (tokens.authTokenExpiresIn - 2) * 1000
-            this.refreshExpiresAt = now + (tokens.refreshTokenExpiresIn - 2) * 1000
+            this.setTokenExpiry('auth', tokens.authTokenExpiresIn)
+            this.setTokenExpiry('refresh', tokens.refreshTokenExpiresIn)
         },
 
         logout() {
@@ -42,24 +52,6 @@ export const useUserStore = defineStore('user', {
             return this.refreshExpiresAt
                 ? Date.now() > this.refreshExpiresAt
                 : true
-        },
-    },
-
-    getters: {
-        authExpiresInSeconds: (state) => {
-            if (!state.authExpiresAt) return 0
-            return Math.max(
-                0,
-                Math.floor((state.authExpiresAt - Date.now()) / 1000),
-            )
-        },
-
-        refreshExpiresInSeconds: (state) => {
-            if (!state.refreshExpiresAt) return 0
-            return Math.max(
-                0,
-                Math.floor((state.refreshExpiresAt - Date.now()) / 1000),
-            )
         },
     },
 

@@ -19,7 +19,6 @@ export async function saveSurveyResult(
             withCredentials: true,
         })
     } catch (err) {
-        console.error(err)
         throw err
     }
 }
@@ -33,7 +32,6 @@ export async function getSurveyResult(): Promise<SurveyResultResponse> {
 
         return res.data
     } catch (err) {
-        console.error(err)
         throw err
     }
 }

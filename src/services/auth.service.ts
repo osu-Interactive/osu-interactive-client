@@ -5,8 +5,6 @@ import authClient from './clients/auth.client.ts'
 export default {
     async initAuth() {
         const store = useUserStore()
-        console.log(store.authExpiresInSeconds)
-        console.log(store.refreshExpiresInSeconds)
         if (store.isAuthExpired()) {
             if (!store.isRefreshExpired()) {
                 await this.refreshAuth()
@@ -40,10 +38,8 @@ export default {
     async refreshAuth(): Promise<RefreshTokenResponse> {
         const store = useUserStore()
         const refreshTokens = await authClient.refresh()
-        console.log(store)
         store.refreshAuthTokens(refreshTokens)
-        console.log('Auth is restored', store.authExpiresInSeconds, store.refreshExpiresInSeconds)
 
         return refreshTokens
-    }
+    },
 }
