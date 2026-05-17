@@ -1,6 +1,6 @@
 <template>
     <div
-        v-if="!surveyStore.isCompleted"
+        v-if="!surveyStore.isCompleted && questions.length"
         class="min-h-screen flex items-center justify-center px-4 text-white bg-[#0F0F1A] bg-[radial-gradient(circle_at_20%_10%,rgba(255,102,170,0.16),transparent_40%),radial-gradient(circle_at_80%_90%,rgba(155,92,255,0.14),transparent_40%)]"
     >
         <div
@@ -17,12 +17,12 @@
             <div class="grid grid-cols-2 gap-4 mb-6">
                 <div
                     v-for="skill in questions[currentStep].skills"
-                    :key="skill.id"
+                    :key="`skill-${skill.id}`"
                     @click="toggleSkill(skill.id)"
-                    class="p-6 border rounded-2xl cursor-pointer transition text-center font-bold bg-[#23233A]/80 hover:-translate-y-1 hover:border-[#FF66AA] hover:shadow-[0_0_22px_rgba(255,102,170,0.25)]"
+                    class="p-6 border rounded-2xl cursor-pointer transition text-center font-bold bg-[#23233A]/80 hover:-translate-y-1 hover:border-[#FF66AA]"
                     :class="
                         selectedSkills.includes(skill.id)
-                            ? 'border-[#FF66AA] bg-linear-to-br from-[#FF66AA]/30 to-[#9B5CFF]/25 shadow-[0_0_24px_rgba(255,102,170,0.35)]'
+                            ? 'border-[#FF66AA] bg-linear-to-br from-[#FF66AA]/30 to-[#9B5CFF]/25'
                             : 'border-white/10 text-[#B8B8D1]'
                     "
                 >
@@ -31,12 +31,12 @@
 
                 <div
                     v-for="mod in questions[currentStep].mods"
-                    :key="mod.id"
+                    :key="`mod-${mod.id}`"
                     @click="toggleMod(mod.id)"
-                    class="p-6 border rounded-2xl cursor-pointer transition text-center font-bold bg-[#23233A]/80 hover:-translate-y-1 hover:border-[#9B5CFF] hover:shadow-[0_0_22px_rgba(155,92,255,0.25)]"
+                    class="p-6 border rounded-2xl cursor-pointer transition text-center font-bold bg-[#23233A]/80 hover:-translate-y-1 hover:border-[#9B5CFF]"
                     :class="
                         selectedMods.includes(mod.id)
-                            ? 'border-[#9B5CFF] bg-linear-to-br from-[#9B5CFF]/30 to-[#FF66AA]/25 shadow-[0_0_24px_rgba(155,92,255,0.35)]'
+                            ? 'border-[#9B5CFF] bg-linear-to-br from-[#9B5CFF]/30 to-[#FF66AA]/25'
                             : 'border-white/10 text-[#B8B8D1]'
                     "
                 >
@@ -48,7 +48,7 @@
                 <button
                     @click="prevStep"
                     :disabled="currentStep === 0"
-                    class="px-5 py-3 rounded-full font-bold transition bg-white/10 text-white border border-white/10 hover:bg-white/15 disabled:opacity-40 disabled:hover:bg-white/10"
+                    class="px-5 py-3 rounded-full font-bold transition bg-white/10 text-white border border-white/10 hover:bg-white/15 disabled:opacity-40"
                 >
                     Previous
                 </button>
@@ -57,7 +57,7 @@
                     v-if="currentStep < questions.length - 1"
                     @click="nextStep"
                     :disabled="!isStepValid()"
-                    class="px-5 py-3 rounded-full font-bold text-white transition bg-linear-to-r from-[#FF66AA] to-[#9B5CFF] shadow-[0_0_22px_rgba(255,102,170,0.45)] hover:scale-105 hover:brightness-110 disabled:opacity-40 disabled:hover:scale-100 disabled:hover:brightness-100"
+                    class="px-5 py-3 rounded-full font-bold text-white transition bg-linear-to-r from-[#FF66AA] to-[#9B5CFF] disabled:opacity-40"
                 >
                     Next
                 </button>
@@ -65,7 +65,7 @@
                 <button
                     v-else
                     @click="confirmFinish"
-                    class="px-5 py-3 rounded-full font-bold text-white transition bg-linear-to-r from-[#FF66AA] to-[#9B5CFF] shadow-[0_0_22px_rgba(255,102,170,0.45)] hover:scale-105 hover:brightness-110"
+                    class="px-5 py-3 rounded-full font-bold text-white transition bg-linear-to-r from-[#FF66AA] to-[#9B5CFF]"
                 >
                     Finish
                 </button>
@@ -78,24 +78,23 @@
             @click="handleCancel"
         >
             <div
-                class="w-80 rounded-[28px] border border-white/10 bg-[#1A1A2E]/95 p-6 text-center text-white shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
+                class="w-80 rounded-[28px] border border-white/10 bg-[#1A1A2E]/95 p-6 text-center text-white"
                 @click.stop
             >
                 <h3 class="text-xl font-extrabold mb-2">Are you sure?</h3>
-
                 <p class="text-[#B8B8D1] mb-4">You will finish the survey</p>
 
                 <div class="flex justify-between gap-3">
                     <button
                         @click="handleCancel"
-                        class="px-4 py-2 rounded-full font-bold transition bg-white/10 text-white border border-white/10 hover:bg-white/15"
+                        class="px-4 py-2 rounded-full font-bold bg-white/10 text-white border border-white/10"
                     >
                         Wait no!
                     </button>
 
                     <button
                         @click="handleConfirm"
-                        class="px-4 py-2 rounded-full font-bold text-white transition bg-linear-to-r from-[#FF66AA] to-[#9B5CFF] shadow-[0_0_18px_rgba(255,102,170,0.4)] hover:scale-105 hover:brightness-110"
+                        class="px-4 py-2 rounded-full font-bold text-white bg-linear-to-r from-[#FF66AA] to-[#9B5CFF]"
                     >
                         Yep, finish it!
                     </button>
@@ -105,11 +104,11 @@
     </div>
 
     <div
-        v-else
-        class="min-h-screen flex items-center justify-center px-4 text-white bg-[#0F0F1A] bg-[radial-gradient(circle_at_20%_10%,rgba(255,102,170,0.16),transparent_40%),radial-gradient(circle_at_80%_90%,rgba(155,92,255,0.14),transparent_40%)]"
+        v-else-if="surveyStore.isCompleted"
+        class="min-h-screen flex items-center justify-center px-4 text-white bg-[#0F0F1A]"
     >
         <div
-            class="max-w-xl w-full rounded-[28px] border border-white/10 bg-white/6 p-8 text-center backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
+            class="max-w-xl w-full rounded-[28px] border border-white/10 bg-white/6 p-8 text-center backdrop-blur-xl"
         >
             <h2 class="text-2xl font-extrabold mb-2 text-white">
                 You have already finished the survey
@@ -119,11 +118,18 @@
 
             <button
                 @click="restartSurvey"
-                class="px-5 py-3 rounded-full font-bold text-white transition bg-linear-to-r from-[#FF66AA] to-[#9B5CFF] shadow-[0_0_22px_rgba(255,102,170,0.45)] hover:scale-105 hover:brightness-110"
+                class="px-5 py-3 rounded-full font-bold text-white bg-linear-to-r from-[#FF66AA] to-[#9B5CFF]"
             >
                 Changed your mind?
             </button>
         </div>
+    </div>
+
+    <div
+        v-else
+        class="min-h-screen flex items-center justify-center px-4 text-white bg-[#0F0F1A]"
+    >
+        Loading survey...
     </div>
 </template>
 
@@ -131,7 +137,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSurveyStore } from '@/stores/survey'
-import { surveyQuestions } from '@/constants/survey-questions'
 import {
     getSurveyResult,
     saveSurveyResult,
@@ -142,12 +147,26 @@ const surveyStore = useSurveyStore()
 
 const selectedSkills = ref<number[]>([])
 const selectedMods = ref<number[]>([])
-const questions = surveyQuestions
+
+interface SurveyOption {
+    id: number
+    code: string
+    name: string
+}
+
+interface SurveyQuestion {
+    id: number
+    title: string
+    skills: SurveyOption[]
+    mods: SurveyOption[]
+}
+
+const questions = ref<SurveyQuestion[]>([])
 
 const currentStep = ref(0)
 
 const nextStep = () => {
-    if (currentStep.value < questions.length - 1) {
+    if (currentStep.value < questions.value.length - 1) {
         currentStep.value++
     }
 }
@@ -159,7 +178,9 @@ const prevStep = () => {
 }
 
 const isStepValid = () => {
-    const q = questions[currentStep.value]
+    const q = questions.value[currentStep.value]
+
+    if (!q) return false
 
     if (q.skills.length > 0) {
         return selectedSkills.value.length > 0
@@ -233,20 +254,29 @@ const toggleMod = (id: number) => {
 
 onMounted(async () => {
     try {
-        if (surveyStore.isCompleted) {
-            selectedSkills.value = surveyStore.skillsets
-            selectedMods.value = surveyStore.mods
-            return
-        }
-
         const data = await getSurveyResult()
 
-        selectedSkills.value = data.skillsets || []
-        selectedMods.value = data.mods || []
+        console.log('survey data:', data)
 
-        if (data.skillsets?.length || data.mods?.length) {
-            surveyStore.setSurvey(data.skillsets || [], data.mods || [])
-        }
+        questions.value = [
+            {
+                id: 1,
+                title: 'Choose skill sets',
+                skills: data.skillsets,
+                mods: [],
+            },
+            {
+                id: 2,
+                title: 'Choose mods',
+                skills: [],
+                mods: data.mods,
+            },
+        ]
+
+        console.log('questions:', questions.value)
+
+        selectedSkills.value = data.selectedSkillsets || []
+        selectedMods.value = data.selectedMods || []
     } catch (err) {
         console.error('Не вдалося завантажити survey', err)
     }
