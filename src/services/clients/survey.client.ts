@@ -6,9 +6,17 @@ export interface SurveyResultRequest {
     mods: number[]
 }
 
+export interface SurveyOption {
+    id: number
+    code: string
+    name: string
+}
+
 export interface SurveyResultResponse {
-    skillsets: number[]
-    mods: number[]
+    skillsets: SurveyOption[]
+    mods: SurveyOption[]
+    selectedSkillsets: number[]
+    selectedMods: number[]
 }
 
 export async function saveSurveyResult(
