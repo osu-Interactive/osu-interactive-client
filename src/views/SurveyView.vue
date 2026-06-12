@@ -261,12 +261,24 @@ onMounted(async () => {
         questions.value = [
             {
                 id: 1,
-                title: 'Choose skill sets',
-                skills: data.skillsets,
+                title: 'Choose aim skillsets',
+                skills: data.skillsets.filter((s) => s.category === 'aim'),
                 mods: [],
             },
             {
                 id: 2,
+                title: 'Choose tapping skillsets',
+                skills: data.skillsets.filter((s) => s.category === 'tapping'),
+                mods: [],
+            },
+            {
+                id: 3,
+                title: 'Choose reading skillsets',
+                skills: data.skillsets.filter((s) => s.category === 'reading'),
+                mods: [],
+            },
+            {
+                id: 4,
                 title: 'Choose mods',
                 skills: [],
                 mods: data.mods,
