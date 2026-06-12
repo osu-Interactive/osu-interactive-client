@@ -4,7 +4,7 @@ import config from '@/config.ts'
 export default {
     async getMe() {
         try {
-            const res = await axios.get(`${config.server_url}/auth/me`, {
+            const res = await axios.get(`${config.server_url}/user`, {
                 requiresAuth: true,
             })
 
